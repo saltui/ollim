@@ -3,7 +3,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mockit - Beautiful Screenshot Mockups",
+  title: "올림 - Beautiful Screenshot Mockups",
   description: "Create stunning device mockups for your screenshots in seconds",
 };
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { Sparkles } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
 export function Header() {
@@ -13,15 +12,15 @@ export function Header() {
       }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5">
-        <div
-          className="w-7 h-7 rounded-lg flex items-center justify-center"
-          style={{ background: 'var(--text-primary)' }}
+      <div className="flex items-center">
+        <span
+          className="text-lg font-bold tracking-wide"
+          style={{
+            color: 'var(--text-primary)',
+            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          }}
         >
-          <Sparkles className="w-4 h-4" style={{ color: 'var(--bg-primary)' }} />
-        </div>
-        <span className="text-[15px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-          Mockit
+          OLLIM
         </span>
       </div>
 

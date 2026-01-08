@@ -220,20 +220,28 @@ export const Canvas = forwardRef<HTMLDivElement, CanvasProps>(
         >
           {/* Canvas Preview Area */}
           <div
-            ref={ref}
-            className="relative flex items-center justify-center shrink-0 rounded-lg"
+            className="relative shrink-0 rounded-lg"
             style={{
               width: canvasWidth,
               height: canvasHeight,
               aspectRatio: `${canvasWidth} / ${canvasHeight}`,
+              // Checkerboard pattern for transparent preview (not exported)
               background: background === 'transparent'
                 ? 'repeating-conic-gradient(#e5e5e5 0% 25%, #ffffff 0% 50%) 50% / 20px 20px'
-                : background,
+                : 'transparent',
               transform: `scale(${previewScale * (zoom / 100)})`,
               transformOrigin: 'center center',
               boxShadow: 'var(--shadow-lg)',
             }}
           >
+            {/* Actual canvas content (this gets exported) */}
+            <div
+              ref={ref}
+              className="absolute inset-0 flex items-center justify-center"
+              style={{
+                background: background === 'transparent' ? 'transparent' : background,
+              }}
+            >
             <AnimatePresence mode="wait">
               <motion.div
                 key="content"
@@ -247,6 +255,7 @@ export const Canvas = forwardRef<HTMLDivElement, CanvasProps>(
                 {renderDevice()}
               </motion.div>
             </AnimatePresence>
+            </div>
           </div>
 
           {/* Drag Overlay */}
