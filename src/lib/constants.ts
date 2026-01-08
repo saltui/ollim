@@ -1,4 +1,4 @@
-import { GradientPreset, IPhoneModelConfig, IPhoneColorConfig, PixelModelConfig, PixelColorConfig } from './types';
+import { GradientPreset, IPhoneModelConfig, IPhoneColorConfig, PixelModelConfig, PixelColorConfig, BrowserConfig } from './types';
 
 export const IPHONE_MODELS: IPhoneModelConfig[] = [
   {
@@ -109,6 +109,54 @@ export const PIXEL_COLORS: PixelColorConfig[] = [
     thumbImage: '/thumbs/pixel-7-pro/display.png',
     previewColor: '#3f3f46',
     is3D: true,
+  },
+];
+
+export const BROWSER_CONFIGS: BrowserConfig[] = [
+  {
+    id: 'safari',
+    name: 'Safari',
+    themes: {
+      light: {
+        frameImage: '/frames/browser/safari-light.png',
+        thumbImage: '/thumbs/browser/safari-light.png',
+        previewColor: '#f5f5f7',
+      },
+      dark: {
+        frameImage: '/frames/browser/safari-dark.png',
+        thumbImage: '/thumbs/browser/safari-dark.png',
+        previewColor: '#1c1c1e',
+      },
+    },
+    // Screen positioning (percentage-based, 200x150 frame)
+    // Title bar is approximately 20% of height
+    screenTop: 20,
+    screenLeft: 0,
+    screenWidth: 100,
+    screenHeight: 80,
+    screenBorderRadius: 0,
+  },
+  {
+    id: 'chrome',
+    name: 'Chrome',
+    themes: {
+      light: {
+        frameImage: '/frames/browser/chrome-light.png',
+        thumbImage: '/thumbs/browser/chrome-light.png',
+        previewColor: '#dee1e6',
+      },
+      dark: {
+        frameImage: '/frames/browser/chrome-dark.png',
+        thumbImage: '/thumbs/browser/chrome-dark.png',
+        previewColor: '#202124',
+      },
+    },
+    // Screen positioning (percentage-based, 200x150 frame)
+    screenTop: 20,
+    screenLeft: 0,
+    screenWidth: 100,
+    screenHeight: 80,
+    screenBorderRadius: 0,
   },
 ];
 
@@ -225,4 +273,9 @@ export const DEFAULT_STATE = {
   iphoneColor: 'white' as const,
   pixelModel: 'pixel-7-pro' as const,
   pixelColor: 'obsidian' as const,
+  browserType: 'safari' as const,
+  browserTheme: 'light' as const,
+  browserAddressUrl: '',
+  browserWindowScale: 100,
+  browserAspectRatio: 'auto' as const,
 };

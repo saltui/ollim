@@ -5,6 +5,7 @@ import { toPng, toBlob, toJpeg } from 'html-to-image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { generateExportFilename } from '@/lib/security';
+import { smartResizeForDevice } from '@/lib/imageUtils';
 import type { ExportOptions } from '@/lib/types';
 import { Header } from '@/components/Header';
 import { Canvas } from '@/components/Canvas';
@@ -12,10 +13,11 @@ import { LeftSidebar, RightSidebar } from '@/components/Sidebar';
 import { ExportModal } from '@/components/ExportModal';
 import { usePaste } from '@/hooks/usePaste';
 import { DEFAULT_STATE } from '@/lib/constants';
-import type { DeviceType, BackgroundType, IPhoneModel, IPhoneColor, PixelModel, PixelColor } from '@/lib/types';
+import type { DeviceType, BackgroundType, IPhoneModel, IPhoneColor, PixelModel, PixelColor, BrowserType, BrowserTheme, BrowserAspectRatio } from '@/lib/types';
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(DEFAULT_STATE.image);
+  const [originalImage, setOriginalImage] = useState<string | null>(null); // Store original for re-processing
   const [deviceType, setDeviceType] = useState<DeviceType>(DEFAULT_STATE.deviceType);
   const [backgroundType, setBackgroundType] = useState<BackgroundType>(DEFAULT_STATE.backgroundType);
   const [backgroundValue, setBackgroundValue] = useState(DEFAULT_STATE.backgroundValue);
@@ -27,6 +29,11 @@ export default function Home() {
   const [iphoneColor, setIphoneColor] = useState<IPhoneColor>(DEFAULT_STATE.iphoneColor);
   const [pixelModel, setPixelModel] = useState<PixelModel>(DEFAULT_STATE.pixelModel);
   const [pixelColor, setPixelColor] = useState<PixelColor>(DEFAULT_STATE.pixelColor);
+  const [browserType, setBrowserType] = useState<BrowserType>(DEFAULT_STATE.browserType);
+  const [browserTheme, setBrowserTheme] = useState<BrowserTheme>(DEFAULT_STATE.browserTheme);
+  const [browserAddressUrl, setBrowserAddressUrl] = useState(DEFAULT_STATE.browserAddressUrl);
+  const [browserWindowScale, setBrowserWindowScale] = useState(DEFAULT_STATE.browserWindowScale);
+  const [browserAspectRatio, setBrowserAspectRatio] = useState<BrowserAspectRatio>(DEFAULT_STATE.browserAspectRatio);
   const [mockupScale, setMockupScale] = useState(100);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -36,9 +43,28 @@ export default function Home() {
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const handleImageChange = useCallback((newImage: string) => {
-    setImage(newImage);
+  // Process image for current device type
+  const processImageForDevice = useCallback(async (imageData: string, device: DeviceType) => {
+    try {
+      const processed = await smartResizeForDevice(imageData, device);
+      setImage(processed);
+    } catch (error) {
+      console.error('Failed to process image:', error);
+      setImage(imageData); // Fallback to original
+    }
   }, []);
+
+  const handleImageChange = useCallback((newImage: string) => {
+    setOriginalImage(newImage); // Store original
+    processImageForDevice(newImage, deviceType);
+  }, [deviceType, processImageForDevice]);
+
+  // Re-process image when device type changes
+  useEffect(() => {
+    if (originalImage) {
+      processImageForDevice(originalImage, deviceType);
+    }
+  }, [deviceType, originalImage, processImageForDevice]);
 
   usePaste(handleImageChange);
 
@@ -154,6 +180,8 @@ export default function Home() {
           iphoneColor={iphoneColor}
           pixelModel={pixelModel}
           pixelColor={pixelColor}
+          browserType={browserType}
+          browserTheme={browserTheme}
           onDeviceChange={setDeviceType}
           onBackgroundTypeChange={setBackgroundType}
           onBackgroundValueChange={setBackgroundValue}
@@ -162,6 +190,14 @@ export default function Home() {
           onIphoneColorChange={setIphoneColor}
           onPixelModelChange={setPixelModel}
           onPixelColorChange={setPixelColor}
+          onBrowserTypeChange={setBrowserType}
+          onBrowserThemeChange={setBrowserTheme}
+          browserAddressUrl={browserAddressUrl}
+          browserWindowScale={browserWindowScale}
+          browserAspectRatio={browserAspectRatio}
+          onBrowserAddressUrlChange={setBrowserAddressUrl}
+          onBrowserWindowScaleChange={setBrowserWindowScale}
+          onBrowserAspectRatioChange={setBrowserAspectRatio}
           isModelPickerOpen={isModelPickerOpen}
           onModelPickerOpenChange={setIsModelPickerOpen}
         />
@@ -179,6 +215,11 @@ export default function Home() {
           iphoneColor={iphoneColor}
           pixelModel={pixelModel}
           pixelColor={pixelColor}
+          browserType={browserType}
+          browserTheme={browserTheme}
+          browserAddressUrl={browserAddressUrl}
+          browserWindowScale={browserWindowScale}
+          browserAspectRatio={browserAspectRatio}
           mockupScale={mockupScale}
           onImageChange={handleImageChange}
         />

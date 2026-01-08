@@ -17,6 +17,12 @@ export type PixelModel = 'pixel-7-pro';
 
 export type PixelColor = 'hazel' | 'obsidian' | 'snow' | 'display';
 
+export type BrowserType = 'safari' | 'chrome';
+
+export type BrowserTheme = 'light' | 'dark';
+
+export type BrowserAspectRatio = 'auto' | '16:9' | '4:3' | '1:1';
+
 export interface IPhoneModelConfig {
   id: IPhoneModel;
   name: string;
@@ -62,6 +68,29 @@ export interface PixelColorConfig {
   is3D?: boolean;
 }
 
+export interface BrowserConfig {
+  id: BrowserType;
+  name: string;
+  themes: {
+    light: {
+      frameImage: string;
+      thumbImage: string;
+      previewColor: string;
+    };
+    dark: {
+      frameImage: string;
+      thumbImage: string;
+      previewColor: string;
+    };
+  };
+  // Screen area positioning (percentage-based)
+  screenTop: number;
+  screenLeft: number;
+  screenWidth: number;
+  screenHeight: number;
+  screenBorderRadius: number;
+}
+
 export interface GradientPreset {
   id: string;
   name: string;
@@ -82,4 +111,9 @@ export interface AppState {
   iphoneColor: IPhoneColor;
   pixelModel: PixelModel;
   pixelColor: PixelColor;
+  browserType: BrowserType;
+  browserTheme: BrowserTheme;
+  browserAddressUrl: string;
+  browserWindowScale: number;
+  browserAspectRatio: BrowserAspectRatio;
 }
