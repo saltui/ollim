@@ -2,6 +2,13 @@ export type DeviceType = 'iphone' | 'pixel' | 'browser' | 'none';
 
 export type BackgroundType = 'gradient' | 'solid' | 'transparent';
 
+export type ExportFormat = 'png' | 'jpeg';
+
+export interface ExportOptions {
+  format: ExportFormat;
+  quality: number; // 1-100, only for JPEG
+}
+
 export type IPhoneModel = 'iphone-17';
 
 export type IPhoneColor = 'black' | 'white' | 'lavender' | 'sage' | 'mist-blue' | 'display';

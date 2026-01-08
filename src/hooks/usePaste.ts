@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
+import { validateImage } from '@/lib/security';
 
-export function usePaste(onImagePaste: (imageData: string) => void) {
+export function usePaste(onImagePaste: (imageData: string) => void, onError?: (error: string) => void) {
   const handlePaste = useCallback(
-    (event: ClipboardEvent) => {
+    async (event: ClipboardEvent) => {
       const items = event.clipboardData?.items;
       if (!items) return;
 
@@ -13,6 +14,13 @@ export function usePaste(onImagePaste: (imageData: string) => void) {
           event.preventDefault();
           const file = item.getAsFile();
           if (file) {
+            // Validate image before processing
+            const validation = await validateImage(file);
+            if (!validation.valid) {
+              onError?.(validation.error || 'Invalid image');
+              return;
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
               const result = e.target?.result;
@@ -20,13 +28,16 @@ export function usePaste(onImagePaste: (imageData: string) => void) {
                 onImagePaste(result);
               }
             };
+            reader.onerror = () => {
+              onError?.('Failed to read image file');
+            };
             reader.readAsDataURL(file);
           }
           break;
         }
       }
     },
-    [onImagePaste]
+    [onImagePaste, onError]
   );
 
   useEffect(() => {

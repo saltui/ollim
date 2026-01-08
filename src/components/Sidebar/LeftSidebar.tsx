@@ -403,6 +403,14 @@ export function LeftSidebar({
                       alt={colorOption.name}
                       className="w-12 h-12 object-contain"
                     />
+                    {colorOption.is3D && (
+                      <span
+                        className="absolute bottom-0 right-0 text-[9px] font-medium px-1 py-0.5 rounded"
+                        style={{ background: 'var(--bg-elevated)', color: 'var(--text-tertiary)' }}
+                      >
+                        3D
+                      </span>
+                    )}
                   </div>
                   <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
                     {colorOption.name}

@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { toPng, toBlob } from 'html-to-image';
+import { toPng, toBlob, toJpeg } from 'html-to-image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
+import { generateExportFilename } from '@/lib/security';
+import type { ExportOptions } from '@/lib/types';
 import { Header } from '@/components/Header';
 import { Canvas } from '@/components/Canvas';
 import { LeftSidebar, RightSidebar } from '@/components/Sidebar';
+import { ExportModal } from '@/components/ExportModal';
 import { usePaste } from '@/hooks/usePaste';
 import { DEFAULT_STATE } from '@/lib/constants';
 import type { DeviceType, BackgroundType, IPhoneModel, IPhoneColor, PixelModel, PixelColor } from '@/lib/types';
@@ -26,6 +29,7 @@ export default function Home() {
   const [pixelColor, setPixelColor] = useState<PixelColor>(DEFAULT_STATE.pixelColor);
   const [mockupScale, setMockupScale] = useState(100);
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
@@ -81,7 +85,7 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleCopyToClipboard]);
 
-  const handleExport = async () => {
+  const handleExport = async (options: ExportOptions) => {
     if (!canvasRef.current) return;
 
     setIsExporting(true);
@@ -90,20 +94,40 @@ export default function Home() {
       const originalTransform = canvasRef.current.style.transform;
       canvasRef.current.style.transform = 'scale(1)';
 
-      const dataUrl = await toPng(canvasRef.current, {
-        width: canvasWidth,
-        height: canvasHeight,
-        pixelRatio: 2, // 2x resolution for high quality export
-      });
+      let dataUrl: string;
+      let filename: string;
+
+      if (options.format === 'jpeg') {
+        // JPEG export with quality option
+        dataUrl = await toJpeg(canvasRef.current, {
+          width: canvasWidth,
+          height: canvasHeight,
+          pixelRatio: 2,
+          quality: options.quality / 100, // html-to-image uses 0-1 range
+          backgroundColor: '#ffffff', // JPEG doesn't support transparency
+        });
+        filename = generateExportFilename('ollim').replace('.png', '.jpg');
+      } else {
+        // PNG export (lossless)
+        dataUrl = await toPng(canvasRef.current, {
+          width: canvasWidth,
+          height: canvasHeight,
+          pixelRatio: 2,
+        });
+        filename = generateExportFilename('ollim');
+      }
 
       // Restore preview transform
       canvasRef.current.style.transform = originalTransform;
 
-      // Download
+      // Download with sanitized filename
       const link = document.createElement('a');
-      link.download = `mockit-${Date.now()}.png`;
+      link.download = filename;
       link.href = dataUrl;
       link.click();
+
+      // Close modal after successful export
+      setIsExportModalOpen(false);
     } catch (error) {
       console.error('Export failed:', error);
     } finally {
@@ -167,10 +191,20 @@ export default function Home() {
           onZoomChange={setZoom}
           onCanvasSizeChange={handleCanvasSizeChange}
           onMockupScaleChange={setMockupScale}
-          onExport={handleExport}
+          onExportClick={() => setIsExportModalOpen(true)}
           isExporting={isExporting}
         />
       </div>
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onExport={handleExport}
+        isExporting={isExporting}
+        canvasWidth={canvasWidth}
+        canvasHeight={canvasHeight}
+      />
 
       {/* Copy Toast */}
       <AnimatePresence>

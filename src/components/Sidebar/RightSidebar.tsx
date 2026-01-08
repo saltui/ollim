@@ -11,7 +11,7 @@ interface RightSidebarProps {
   onZoomChange: (value: number) => void;
   onCanvasSizeChange: (width: number, height: number) => void;
   onMockupScaleChange: (value: number) => void;
-  onExport: () => void;
+  onExportClick: () => void;
   isExporting: boolean;
 }
 
@@ -52,7 +52,7 @@ export function RightSidebar({
   onZoomChange,
   onCanvasSizeChange,
   onMockupScaleChange,
-  onExport,
+  onExportClick,
   isExporting,
 }: RightSidebarProps) {
   const currentPreset = CANVAS_SIZES.find(
@@ -181,7 +181,7 @@ export function RightSidebar({
       {/* Export Button */}
       <div className="p-4 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
         <button
-          onClick={onExport}
+          onClick={onExportClick}
           disabled={isExporting}
           className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all"
           style={{
@@ -192,7 +192,7 @@ export function RightSidebar({
           }}
         >
           <Download className="w-4 h-4" />
-          <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
+          <span>{isExporting ? 'Exporting...' : 'Export'}</span>
         </button>
       </div>
     </aside>
